@@ -1,0 +1,47 @@
+[
+    {
+      "question": "What is LifeVault?",
+      "answer": "LifeVault is a secure data storage platform focused on privacy and blockchain integration."
+    },
+    {
+      "question": "How can I upload files?",
+      "answer": "You can upload files by logging into your LifeVault account and navigating to the upload section."
+    },
+    {
+      "question": "How does LifeVault ensure my data security?",
+      "answer": "LifeVault uses advanced encryption and blockchain-based authentication to secure your data, ensuring only you have access."
+    },
+    {
+      "question": "What is blockchain-based control?",
+      "answer": "Blockchain-based control in LifeVault means data access and changes are transparent and tamper-proof, protected by blockchain technology."
+    },
+    {
+      "question": "How do I access my encrypted data?",
+      "answer": "You can access your encrypted data by logging into LifeVault with your credentials, where you will decrypt files directly on the platform."
+    },
+    {
+      "question": "Can I integrate LifeVault with other apps?",
+      "answer": "Yes, LifeVault offers integration options with compatible apps for seamless data management across platforms."
+    },
+    {
+      "question": "How does LifeVault use decentralized storage?",
+      "answer": "LifeVault stores data across a network of decentralized nodes, ensuring redundancy and availability without reliance on a central server."
+    },
+    {
+      "question": "Is LifeVault suitable for corporate data?",
+      "answer": "Yes, LifeVault provides corporate-grade encryption and access controls, making it suitable for sensitive business data storage."
+    },
+    {
+      "question": "How do I start using LifeVault?",
+      "answer": "To get started, sign up on LifeVault's website, set up your profile, and start uploading and managing your files securely."
+    },
+    {
+      "question": "Why use blockchain for personal data?",
+      "answer": "Blockchain enhances data privacy and security by decentralizing data storage and adding transparency and immutability to data access records."
+    },
+    {
+      "question": "What are the benefits of LifeVault's privacy features?",
+      "answer": "LifeVault’s privacy features include end-to-end encryption, blockchain authentication, and user-only decryption keys for ultimate data control."
+    }
+  ]
+  

@@ -1,6 +1,6 @@
 import streamlit as st
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader
 from transformers import T5Tokenizer, T5ForConditionalGeneration, BlipProcessor, BlipForConditionalGeneration, pipeline
 import torch
 import base64
@@ -8,11 +8,13 @@ from PIL import Image
 from docx import Document
 from pptx import Presentation
 import io
+from langchain.schema import Document
+import pdfplumber
 
 # Model and tokenizer loading for text summarization
 checkpoint = "LaMini-Flan-T5-248M"
-tokenizer = T5Tokenizer.from_pretrained(checkpoint)
-base_model = T5ForConditionalGeneration.from_pretrained(checkpoint)
+tokenizer = T5Tokenizer.from_pretrained("MBZUAI/LaMini-Flan-T5-248M", legacy=False)
+base_model = T5ForConditionalGeneration.from_pretrained("MBZUAI/LaMini-Flan-T5-248M")
 
 # Summarization pipeline (with caching for faster reuse)
 @st.cache_resource
@@ -22,7 +24,7 @@ def load_summarization_pipeline():
         model=base_model,
         tokenizer=tokenizer,
         device=0 if torch.cuda.is_available() else -1,
-        max_length=500,
+        max_length=100,
         min_length=50
     )
 
@@ -35,20 +37,34 @@ def load_image_description_model():
 
 # File processing functions for PDF, DOCX, PPTX
 def file_preprocessing(file, file_type):
+    pages = []
+
     if file_type == 'pdf':
-        loader = PyPDFLoader(file)
-        pages = loader.load_and_split()
+        with pdfplumber.open(file) as pdf:
+            for page in pdf.pages:
+                text = page.extract_text()
+                if text:
+                    pages.append(Document(page_content=text))  # Wrap text in a Document object
     elif file_type == 'docx':
-        pages = [Document(file).text]  # Extracts text from a DOCX file
+        doc = Document(file)
+        pages.append(Document(page_content=doc.text))  # Wrap DOCX text in a Document object
     elif file_type == 'pptx':
-        pages = []
         presentation = Presentation(file)
         for slide in presentation.slides:
+            slide_text = ""
             for shape in slide.shapes:
                 if shape.has_text_frame:
-                    pages.append(shape.text)
+                    slide_text += shape.text + "\n"  # Concatenate all text from the slide
+            if slide_text.strip():  # Check if there's any text
+                pages.append(Document(page_content=slide_text))  # Wrap slide text in a Document object
+
+    if not pages:
+        st.error("No text found in the uploaded file.")
+        return ""
+
+    # Now we can safely use the text_splitter
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=50)
-    texts = text_splitter.split_documents(pages)
+    texts = text_splitter.split_documents(pages)  # This will now work correctly
     final_texts = ""
     for text in texts:
         final_texts += text.page_content
@@ -58,8 +74,10 @@ def file_preprocessing(file, file_type):
 def llm_pipeline(file_content, file_type):
     summarizer = load_summarization_pipeline()
     input_text = file_preprocessing(file_content, file_type)
-    result = summarizer(input_text)
-    return result[0]['summary_text'] if result else "No summary generated."
+    if input_text:
+        result = summarizer(input_text)
+        return result[0]['summary_text'] if result else "No summary generated."
+    return "No input text available for summarization."
 
 # Image description function
 def describe_image(image_file):
